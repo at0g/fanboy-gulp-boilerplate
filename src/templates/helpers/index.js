@@ -1,0 +1,1 @@
+exports.assetPath = require('./assetPath');
