@@ -34,6 +34,7 @@ var paths = {
     },
     build: {
         dir: path.join(process.cwd(), 'dist'),
+        manifest: 'bundle.json',
         css: {
             dir: './dist/css'
         },
@@ -42,6 +43,9 @@ var paths = {
         }
     }
 };
+
+var manifest = {};
+
 
 
 
@@ -65,9 +69,15 @@ gulp.task('webserver', function(){
     })
 });
 
+gulp.task('reload:manifest', function(cb){
+    fs.readFile(paths.build.dir + '/' + paths.build.manifest, {encoding: 'utf8'}, function(err, json){
+        manifest = JSON.parse(json);
+        cb(err, manifest);
+    });
+});
+
 gulp.task('stylus', function(){
-    var manifest = JSON.parse(fs.readFileSync(paths.build.dir + '/bundle.json', 'utf8')),
-        replacements = [],
+    var replacements = [],
         keys = Object.keys(manifest),
         isImg = /\.(png|jpg|gif|svg)/
         ;
@@ -95,25 +105,12 @@ gulp.task('imagemin', function(){
         .pipe( imagemin() )
         .pipe( rev() )
         .pipe( gulp.dest(paths.build.dir) )
-        .pipe( rev.manifest('bundle.json', {
+        .pipe( rev.manifest( paths.build.manifest, {
             base: paths.build.dir, merge: true
         }) )
-        .pipe( gulp.dest(paths.build.dir + '/bundle.json') )
+        .pipe( gulp.dest(paths.build.dir + '/' + paths.build.manifest) )
     ;
 });
-
-gulp.task('handlebars', function(){
-    var manifest = JSON.parse(fs.readFileSync(paths.build.dir + '/bundle.json', 'utf8')),
-        helpers  = require('./src/templates/helpers')
-        ;
-    return gulp.src('./src/templates/index.hbs')
-        .pipe( handlebars(manifest, { helpers: helpers }) )
-        .pipe( rename('index.html') )
-        .pipe( gulp.dest(paths.build.dir) )
-        .pipe( connect.reload() )
-        ;
-});
-
 
 gulp.task('bundle:css', function(){
 
@@ -125,16 +122,28 @@ gulp.task('bundle:css', function(){
         .pipe( rev.manifest({
             base: paths.build.dir,
             merge: true,
-            path: paths.build.dir + '/bundle.json'
+            path: paths.build.dir + '/' + paths.build.manifest
         }) )
         .pipe( gulp.dest(paths.build.dir) )
     ;
+});
+
+gulp.task('handlebars', function(){
+    var helpers = require('./src/templates/helpers');
+
+    return gulp.src('./src/templates/index.hbs')
+        .pipe( handlebars(manifest, { helpers: helpers }) )
+        .pipe( rename('index.html') )
+        .pipe( gulp.dest(paths.build.dir) )
+        .pipe( connect.reload() )
+        ;
 });
 
 gulp.task('compile:with-images', function(cb){
     runSequence(
         'clean:images',
         'imagemin',
+        'reload:manifest',
         'compile',
         cb
     )
@@ -145,6 +154,7 @@ gulp.task('compile', function(cb){
         'clean:css',
         'stylus',
         'bundle:css',
+        'reload:manifest',
         'handlebars',
         cb
     )
