@@ -10,6 +10,7 @@ var gulp        = require('gulp'),
     rename      = require('gulp-rename'),
     replace     = require('gulp-batch-replace'),
     imagemin    = require('gulp-imagemin'),
+    svgstore    = require('gulp-svgstore'),
     del         = require('del'),
     runSequence = require('run-sequence')
 ;
@@ -21,6 +22,9 @@ var paths = {
         dir: path.join(process.cwd(), 'src'),
         images: {
             dir: path.join(process.cwd(), 'src/assets/img')
+        },
+        svg: {
+            dir: path.join(process.cwd(), 'src/assets/svg')
         },
         styles: {
             dir: path.join(process.cwd(), 'src/styles'),
@@ -40,6 +44,9 @@ var paths = {
         },
         images: {
             dir: './dist/assets/images'
+        },
+        svg: {
+            dir: './dist/assets/svg'
         }
     }
 };
@@ -59,6 +66,10 @@ gulp.task('clean:css', function(cb){
 
 gulp.task('clean:images', function(cb){
     del([paths.build.images.dir], cb);
+});
+
+gulp.task('clean:svg', function(cb){
+    del([paths.build.svg.dir], cb);
 });
 
 gulp.task('webserver', function(){
@@ -114,6 +125,20 @@ gulp.task('imagemin', function(){
     ;
 });
 
+gulp.task('svgstore', function(){
+    return gulp.src( paths.src.svg.dir + '/**/*.svg' )
+        .pipe( svgstore({ fileName: 'assets/svg/svgstore.svg' }) )
+        .pipe( rev() )
+        .pipe( gulp.dest( paths.build.dir ) )
+        .pipe( rev.manifest({
+            base: paths.build.dir,
+            merge: true,
+            path: paths.build.dir + '/' + paths.build.manifest
+        }) )
+        .pipe( gulp.dest(paths.build.dir) )
+    ;
+});
+
 gulp.task('bundle:css', function(){
 
     return gulp.src( paths.build.css.dir + '/**/*.css', { base: paths.build.dir })
@@ -146,14 +171,25 @@ gulp.task('compile:with-images', function(cb){
         'clean:images',
         'imagemin',
         'reload:manifest',
-        'compile',
+        'compile:css',
         cb
     )
 });
 
-gulp.task('compile', function(cb){
+gulp.task('compile:svg', function(cb){
+    runSequence(
+        'clean:svg',
+        'svgstore',
+        'reload:manifest',
+        'handlebars',
+        cb
+    );
+});
+
+gulp.task('compile:css', function(cb){
     runSequence(
         'clean:css',
+        'reload:manifest',
         'stylus',
         'bundle:css',
         'reload:manifest',
@@ -162,14 +198,25 @@ gulp.task('compile', function(cb){
     )
 });
 
+gulp.task('compile:all', function(cb){
+    runSequence(
+        'clean:build',
+        'imagemin',
+        'svgstore',
+        'compile:css',
+        cb
+    );
+});
+
 gulp.task('watch', function(){
 
     var stylusWatchTargets = [paths.src.styles.dir + '/**/*.styl'].concat(paths.src.styles.includes.map(function(p){
         return p + '/**/*.styl'
     }));
-    gulp.watch(stylusWatchTargets, ['compile']);
+    gulp.watch(stylusWatchTargets, ['compile:css']);
     gulp.watch(paths.src.images.dir + '**/*', ['compile:with-images']);
-    gulp.watch(paths.src.templates.dir + '**/*', ['handlebars'] );
+    gulp.watch(paths.src.templates.dir + '**/*', ['handlebars']);
+    gulp.watch(paths.src.svg.dir + '**/*.svg', ['compile:svg']);
 });
 
-gulp.task('default', ['watch', 'webserver', 'compile:with-images']);
+gulp.task('default', ['watch', 'webserver', 'compile:all']);
