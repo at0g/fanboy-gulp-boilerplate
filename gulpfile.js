@@ -125,7 +125,8 @@ gulp.task('compile:with-images', function(cb){
     runSequence(
         'clean:images',
         'imagemin',
-        'compile'
+        'compile',
+        cb
     )
 });
 
@@ -134,7 +135,8 @@ gulp.task('compile', function(cb){
         'clean:css',
         'stylus',
         'bundle:css',
-        'handlebars'
+        'handlebars',
+        cb
     )
 });
 
@@ -144,6 +146,7 @@ gulp.task('watch', function(){
         return p + '/**/*.styl'
     }));
     gulp.watch(stylusFilesToWatch, ['compile']);
+//    gulp.watch('./src/styles/**/*.styl', ['compile']);
     gulp.watch(paths.src.images.dir + '**/*', ['compile:with-images']);
     gulp.watch(paths.src.templates.dir + '**/*', ['handlebars'] );
 });
