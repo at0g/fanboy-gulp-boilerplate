@@ -2,6 +2,7 @@ var gulp        = require('gulp'),
     fs          = require('fs'),
     path        = require('path'),
     sourcemaps  = require('gulp-sourcemaps'),
+    connect     = require('gulp-connect'),
     rev         = require('gulp-rev'),
     stylus      = require('gulp-stylus'),
     please      = require('gulp-pleeease'),
@@ -56,6 +57,14 @@ gulp.task('clean:images', function(cb){
     del([paths.build.images.dir], cb);
 });
 
+gulp.task('webserver', function(){
+    connect.server({
+        livereload: true,
+        port: 3000,
+        root: [paths.build.dir]
+    })
+});
+
 gulp.task('stylus', function(){
     var manifest = JSON.parse(fs.readFileSync(paths.build.dir + '/bundle.json', 'utf8')),
         replacements = [],
@@ -93,7 +102,7 @@ gulp.task('imagemin', function(){
     ;
 });
 
-gulp.task('handlebars', function(cb){
+gulp.task('handlebars', function(){
     var manifest = JSON.parse(fs.readFileSync(paths.build.dir + '/bundle.json', 'utf8')),
         helpers  = require('./src/templates/helpers')
         ;
@@ -101,6 +110,7 @@ gulp.task('handlebars', function(cb){
         .pipe( handlebars(manifest, { helpers: helpers }) )
         .pipe( rename('index.html') )
         .pipe( gulp.dest(paths.build.dir) )
+        .pipe( connect.reload() )
         ;
 });
 
@@ -150,4 +160,4 @@ gulp.task('watch', function(){
     gulp.watch(paths.src.templates.dir + '**/*', ['handlebars'] );
 });
 
-gulp.task('default', ['watch', 'compile:with-images']);
+gulp.task('default', ['watch', 'webserver', 'compile:with-images']);
