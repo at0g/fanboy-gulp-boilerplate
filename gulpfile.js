@@ -105,10 +105,12 @@ gulp.task('imagemin', function(){
         .pipe( imagemin() )
         .pipe( rev() )
         .pipe( gulp.dest(paths.build.dir) )
-        .pipe( rev.manifest( paths.build.manifest, {
-            base: paths.build.dir, merge: true
+        .pipe( rev.manifest({
+            base: paths.build.dir,
+            merge: true,
+            path: paths.build.dir + '/' + paths.build.manifest
         }) )
-        .pipe( gulp.dest(paths.build.dir + '/' + paths.build.manifest) )
+        .pipe( gulp.dest(paths.build.dir) )
     ;
 });
 
