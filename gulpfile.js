@@ -142,11 +142,10 @@ gulp.task('compile', function(cb){
 
 gulp.task('watch', function(){
 
-    var stylusFilesToWatch = [paths.src.styles.dir + '/**/*.styl'].concat(paths.src.styles.includes.map(function(p){
+    var stylusWatchTargets = [paths.src.styles.dir + '/**/*.styl'].concat(paths.src.styles.includes.map(function(p){
         return p + '/**/*.styl'
     }));
-    gulp.watch(stylusFilesToWatch, ['compile']);
-//    gulp.watch('./src/styles/**/*.styl', ['compile']);
+    gulp.watch(stylusWatchTargets, ['compile']);
     gulp.watch(paths.src.images.dir + '**/*', ['compile:with-images']);
     gulp.watch(paths.src.templates.dir + '**/*', ['handlebars'] );
 });
