@@ -4,6 +4,7 @@ var del         = require('del'),
     replace     = require('gulp-batch-replace'),
     cheerio     = require('gulp-cheerio'),
     handlebars  = require('gulp-compile-handlebars'),
+    concat      = require('gulp-concat'),
     connect     = require('gulp-connect'),
     imagemin    = require('gulp-imagemin'),
     please      = require('gulp-pleeease'),
@@ -13,6 +14,7 @@ var del         = require('del'),
     stylus      = require('gulp-stylus'),
     svgo        = require('gulp-svgo'),
     svgstore    = require('gulp-svgstore'),
+    uglify      = require('gulp-uglify'),
     path        = require('path'),
     runSequence = require('run-sequence')
 ;
@@ -24,6 +26,9 @@ var paths = {
         dir: path.join(process.cwd(), 'src'),
         images: {
             dir: path.join(process.cwd(), 'src/assets/img')
+        },
+        js: {
+            dir: path.join(process.cwd(), 'src/js')
         },
         svg: {
             dir: path.join(process.cwd(), 'src/assets/svg')
@@ -47,6 +52,9 @@ var paths = {
         images: {
             dir: './dist/assets/images'
         },
+        js: {
+            dir: './dist/js'
+        },
         svg: {
             dir: './dist/assets/svg'
         }
@@ -55,6 +63,17 @@ var paths = {
 
 var manifest = {};
 
+
+function writeManifest(){
+    /* @todo: There is probably a fix for the merge option on the way to gulp-rev.
+        When rev is fixed, the gulp.dest calls will probably need updating too.
+    */
+    return rev.manifest({
+        base: paths.build.dir,
+        merge: true,
+        path: paths.build.dir + '/' + paths.build.manifest
+    });
+}
 
 
 
@@ -74,6 +93,10 @@ gulp.task('clean:svg', function(cb){
     del([paths.build.svg.dir], cb);
 });
 
+gulp.task('clean:js', function(cb){
+    del([paths.build.js.dir], cb);
+});
+
 gulp.task('webserver', function(){
     connect.server({
         livereload: true,
@@ -83,10 +106,32 @@ gulp.task('webserver', function(){
 });
 
 gulp.task('reload:manifest', function(cb){
-    fs.readFile(paths.build.dir + '/' + paths.build.manifest, {encoding: 'utf8'}, function(err, json){
+    // @todo: fix this!
+    // Sometimes (the js task) the manifest has not written to disk when this runs.
+    // The short setTimeout seems to resolve it, but is not a good solution
+    setTimeout(function(){
+        var json = fs.readFileSync(paths.build.dir + '/' + paths.build.manifest, 'utf8');
         manifest = JSON.parse(json);
-        cb(err, manifest);
-    });
+        cb();
+    }, 100);
+
+});
+
+
+gulp.task('js', function(){
+    gulp.src([
+        paths.src.dir + '/vendor/svg4everybody/svg4everybody.js',
+        paths.src.js.dir + '/**/*.js'
+    ], { base: paths.src.dir })
+        .pipe( sourcemaps.init() )
+        .pipe( concat('js/app.min.js') )
+        .pipe( uglify() )
+        .pipe( rev() )
+        .pipe( sourcemaps.write('.') )
+        .pipe( gulp.dest(paths.build.dir) )
+        .pipe( writeManifest() )
+        .pipe( gulp.dest(paths.build.dir) )
+    ;
 });
 
 gulp.task('stylus', function(){
@@ -118,11 +163,7 @@ gulp.task('imagemin', function(){
         .pipe( imagemin() )
         .pipe( rev() )
         .pipe( gulp.dest(paths.build.dir) )
-        .pipe( rev.manifest({
-            base: paths.build.dir,
-            merge: true,
-            path: paths.build.dir + '/' + paths.build.manifest
-        }) )
+        .pipe( writeManifest() )
         .pipe( gulp.dest(paths.build.dir) )
     ;
 });
@@ -140,11 +181,7 @@ gulp.task('svgstore', function(){
         .pipe( svgstore({ fileName: 'assets/svg/svgstore.svg' }) )
         .pipe( rev() )
         .pipe( gulp.dest( paths.build.dir ) )
-        .pipe( rev.manifest({
-            base: paths.build.dir,
-            merge: true,
-            path: paths.build.dir + '/' + paths.build.manifest
-        }) )
+        .pipe( writeManifest() )
         .pipe( gulp.dest(paths.build.dir) )
     ;
 });
@@ -156,11 +193,7 @@ gulp.task('bundle:css', function(){
         .pipe( rev() )
         .pipe( sourcemaps.write('.') )
         .pipe( gulp.dest(paths.build.dir) )
-        .pipe( rev.manifest({
-            base: paths.build.dir,
-            merge: true,
-            path: paths.build.dir + '/' + paths.build.manifest
-        }) )
+        .pipe( writeManifest() )
         .pipe( gulp.dest(paths.build.dir) )
     ;
 });
@@ -196,6 +229,16 @@ gulp.task('compile:svg', function(cb){
     );
 });
 
+gulp.task('compile:js', function(cb){
+    runSequence(
+        'clean:js',
+        'js',
+        'reload:manifest',
+        'handlebars',
+        cb
+    );
+});
+
 gulp.task('compile:css', function(cb){
     runSequence(
         'clean:css',
@@ -213,6 +256,7 @@ gulp.task('compile:all', function(cb){
         'clean:build',
         'imagemin',
         'svgstore',
+        'js',
         'compile:css',
         cb
     );
@@ -227,6 +271,7 @@ gulp.task('watch', function(){
     gulp.watch(paths.src.images.dir + '**/*', ['compile:with-images']);
     gulp.watch(paths.src.templates.dir + '**/*', ['handlebars']);
     gulp.watch(paths.src.svg.dir + '**/*.svg', ['compile:svg']);
+    gulp.watch(paths.src.js.dir + '**/*.js', ['compile:js']);
 });
 
 gulp.task('default', ['watch', 'webserver', 'compile:all']);

@@ -1,8 +1,10 @@
+
+
 # npm packages
 node_modules
 
 # build directory
 dist
 
-# generated manifest of asset hash revisions
-src/manifest.json
+# bower packages
+src/vendor

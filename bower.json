@@ -1,0 +1,20 @@
+{
+  "name": "fanboy-gulp",
+  "version": "0.0.0",
+  "authors": [
+    "Ben Daley <benjamindaley@gmail.com>"
+  ],
+  "moduleType": [],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "src/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "svg4everybody": "~1.0.0"
+  }
+}
