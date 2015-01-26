@@ -12,11 +12,42 @@
 </head>
 <body>
 
-<h1>Fanboy gulp example</h1>
-<p>Hello, this is an example page.</p>
+<section>
+    <h1>Fanboy gulp boilerplate</h1>
+    <p>Hello, this is an html example page.</p>
+    <h2>What does the boilerplate do?</h2>
+    <ul>
+        <li>Optimise images</li>
+        <li>Optimise SVG files into a single file (svgstore)</li>
+        <li>Compile CSS from Stylus)</li>
+        <li>Post process CSS using CSS Pleeease</li>
+        <li>Provide complete sourcemaps</li>
+        <li>Create hash revisions of assets (unique names) and update file references</li>
+        <li>Compile a static version of the site (using Handlebars)</li>
+        <li>Provide a preview server with livereload when assets change</li>
+    </ul>
+</section>
 
-<hr>
+
+<section>
+    <h2>HTML img element</h2>
     <img src="{{ assetPath 'assets/img/gulp.png' }}" alt="Gulp logo">
+</section>
+
+<section>
+    <h2>CSS background image</h2>
+    <div class="gulp-logo"></div>
+</section>
+
+<section>
+    <h2>HTML svg[store]</h2>
+    <svg class="icon">
+        <use xlink:href="{{ assetPath 'assets/svg/svgstore.svg' }}#stylus-logo"></use>
+    </svg>
+    <svg class="icon">
+        <use xlink:href="{{ assetPath 'assets/svg/svgstore.svg' }}#gulp-white-text"></use>
+    </svg>
+</section>
 
 </body>
 </html>

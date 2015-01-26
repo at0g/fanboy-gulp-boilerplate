@@ -11,6 +11,8 @@ var gulp        = require('gulp'),
     replace     = require('gulp-batch-replace'),
     imagemin    = require('gulp-imagemin'),
     svgstore    = require('gulp-svgstore'),
+    svgo        = require('gulp-svgo'),
+    cheerio     = require('gulp-cheerio'),
     del         = require('del'),
     runSequence = require('run-sequence')
 ;
@@ -127,6 +129,14 @@ gulp.task('imagemin', function(){
 
 gulp.task('svgstore', function(){
     return gulp.src( paths.src.svg.dir + '/**/*.svg' )
+        .pipe( svgo() )
+        .pipe( cheerio({
+            run: function ($) {
+                $('[fill]').removeAttr('fill');
+                $('[stroke]').removeAttr('stroke');
+            },
+            parserOptions: { xmlMode: true }
+        }) )
         .pipe( svgstore({ fileName: 'assets/svg/svgstore.svg' }) )
         .pipe( rev() )
         .pipe( gulp.dest( paths.build.dir ) )

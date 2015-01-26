@@ -1,4 +1,33 @@
+$margin = 20px
+
 body
-  color red
+  font-family Consolas, Lucida Console, monospace
   transform translate(0,0)
+  margin $margin
+
+section
+  border 1px solid gray
+  border-radius 7px
+  padding $margin
+  margin $margin
+  background-color #f0f0f0
+  > h1, > h2, > h3, > h4, > h5, > h6 {
+    padding-bottom @padding
+    border-bottom @border
+  }
+
+.gulp-logo
+  width 114px
+  height 255px
   background-image url('assets/img/gulp.png')
+
+
+.icon
+  fill currentColor
+  display inline-block
+  width: 120px
+  height 120px
+  background-color white
+  padding: 10px
+  box-sizing border-box
+  border-radius 4px
