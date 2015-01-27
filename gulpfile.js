@@ -128,9 +128,6 @@ gulp.task('js', function(){
         .pipe( gulp.dest(paths.build.dir) )
         .pipe( writeManifest() )
         .pipe( gulp.dest(paths.build.dir) )
-        .on('finish', function(){
-            console.log('JS stream finished')
-        })
     ;
 });
 
