@@ -10,6 +10,7 @@ var del         = require('del'),
     please      = require('gulp-pleeease'),
     rename      = require('gulp-rename'),
     rev         = require('gulp-rev'),
+    size        = require('gulp-size'),
     sourcemaps  = require('gulp-sourcemaps'),
     stylus      = require('gulp-stylus'),
     svgo        = require('gulp-svgo'),
@@ -106,31 +107,30 @@ gulp.task('webserver', function(){
 });
 
 gulp.task('reload:manifest', function(cb){
-    // @todo: fix this!
-    // Sometimes (the js task) the manifest has not written to disk when this runs.
-    // The short setTimeout seems to resolve it, but is not a good solution
-    setTimeout(function(){
-        var json = fs.readFileSync(paths.build.dir + '/' + paths.build.manifest, 'utf8');
-        manifest = JSON.parse(json);
-        cb();
-    }, 100);
-
+    var json = fs.readFileSync(paths.build.dir + '/' + paths.build.manifest, 'utf8');
+    manifest = JSON.parse(json);
+    cb();
 });
 
-
 gulp.task('js', function(){
-    gulp.src([
+    return gulp.src([
         paths.src.dir + '/vendor/svg4everybody/svg4everybody.js',
+        paths.src.dir + '/vendor/zepto/zepto.js',
         paths.src.js.dir + '/**/*.js'
     ], { base: paths.src.dir })
         .pipe( sourcemaps.init() )
         .pipe( concat('js/app.min.js') )
+        .pipe( size() )
         .pipe( uglify() )
+        .pipe( size() )
         .pipe( rev() )
         .pipe( sourcemaps.write('.') )
         .pipe( gulp.dest(paths.build.dir) )
         .pipe( writeManifest() )
         .pipe( gulp.dest(paths.build.dir) )
+        .on('finish', function(){
+            console.log('JS stream finished')
+        })
     ;
 });
 
@@ -153,7 +153,7 @@ gulp.task('stylus', function(){
         .pipe( stylus({
             paths: paths.src.styles.includes
         }) )
-        .pipe( please({ minifier: false }) )
+        .pipe( please() )
         .pipe( sourcemaps.write('.') )
         .pipe( gulp.dest(paths.build.css.dir ) )
 });

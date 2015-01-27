@@ -1,4 +1,7 @@
-(function(){
-    // just a comment
-    console.log('Hello there');
-})();
+$(function(){
+    console.log('document ready');
+    $('body').prepend('<h1>DOM element inserted with $ (Zepto)</h1>');
+
+
+
+});

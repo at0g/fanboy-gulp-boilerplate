@@ -15,6 +15,7 @@
     "tests"
   ],
   "dependencies": {
-    "svg4everybody": "~1.0.0"
+    "svg4everybody": "~1.0.0",
+    "zepto": "~1.1.6"
   }
 }
