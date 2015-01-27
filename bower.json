@@ -2,10 +2,14 @@
   "name": "fanboy-gulp",
   "version": "0.0.0",
   "authors": [
-    "Ben Daley <benjamindaley@gmail.com>"
+    "Ben Daley"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:at0g/fanboy-gulp-boilerplate.git"
+  },
   "moduleType": [],
-  "license": "MIT",
+  "license": "ISC",
   "private": true,
   "ignore": [
     "**/.*",

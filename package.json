@@ -6,7 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Ben Daley <ben@fanboy.io>",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:at0g/fanboy-gulp-boilerplate.git"
+  },
+  "author": "Ben Daley",
   "license": "ISC",
   "devDependencies": {
     "cheerio": "^0.18.0",
