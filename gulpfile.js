@@ -37,7 +37,8 @@ var paths = {
         styles: {
             dir: path.join(process.cwd(), 'src/styles'),
             includes: [
-                path.join(process.cwd(), 'src/stylus-lib')
+                path.join(process.cwd(), 'src/styles/lib'),
+                path.join(process.cwd(), 'src/vendor/bootstrap-stylus')
             ]
         },
         templates: {
@@ -144,7 +145,10 @@ gulp.task('stylus', function(){
         }
     }
 
-    return gulp.src(paths.src.styles.dir + '/**/*.styl')
+    return gulp.src([
+            paths.src.styles.dir + '/**/*.styl',
+            '!' + paths.src.styles.includes + '/**/*.styl'
+        ])
         .pipe( sourcemaps.init() )
         .pipe( replace( replacements ))
         .pipe( stylus({

@@ -16,6 +16,7 @@
   ],
   "dependencies": {
     "svg4everybody": "~1.0.0",
-    "zepto": "~1.1.6"
+    "zepto": "~1.1.6",
+    "bootstrap-stylus": "~4.0.1"
   }
 }
