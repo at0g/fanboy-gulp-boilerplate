@@ -135,7 +135,11 @@ gulp.task('js', function(){
 gulp.task('stylus', function(){
     var replacements = [],
         keys = Object.keys(manifest),
-        isImg = /\.(png|jpg|gif|svg)/
+        isImg = /\.(png|jpg|gif|svg)/,
+        includes = paths.src.styles.includes.map(function(p){
+            return '!' + p + '/**/*.styl';
+        }),
+        src = [paths.src.styles.dir + '/**/*.styl'].concat(includes)
         ;
 
     for(var i = 0; i<keys.length; i++){
@@ -145,10 +149,7 @@ gulp.task('stylus', function(){
         }
     }
 
-    return gulp.src([
-            paths.src.styles.dir + '/**/*.styl',
-            '!' + paths.src.styles.includes + '/**/*.styl'
-        ])
+    return gulp.src(src)
         .pipe( sourcemaps.init() )
         .pipe( replace( replacements ))
         .pipe( stylus({
