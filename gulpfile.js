@@ -1,7 +1,7 @@
-var del         = require('del'),
-    fs          = require('fs'),
+var fs          = require('fs'),
     gulp        = require('gulp'),
     replace     = require('gulp-batch-replace'),
+    clean       = require('gulp-clean'),
     cheerio     = require('gulp-cheerio'),
     handlebars  = require('gulp-compile-handlebars'),
     concat      = require('gulp-concat'),
@@ -79,24 +79,34 @@ function writeManifest(){
 
 
 
-gulp.task('clean:build', function(cb){
-    del([paths.build.dir], cb);
+gulp.task('clean:build', function(){
+    return gulp.src(paths.build.dir, { read: false })
+        .pipe( clean() )
+    ;
 });
 
-gulp.task('clean:css', function(cb){
-    del([paths.build.css.dir], cb);
+gulp.task('clean:css', function(){
+    return gulp.src(paths.build.css.dir, { read: false })
+        .pipe( clean() )
+    ;
 });
 
-gulp.task('clean:images', function(cb){
-    del([paths.build.images.dir], cb);
+gulp.task('clean:images', function(){
+    return gulp.src(paths.build.images.dir, { read: false })
+        .pipe( clean() )
+    ;
 });
 
-gulp.task('clean:svg', function(cb){
-    del([paths.build.svg.dir], cb);
+gulp.task('clean:svg', function(){
+    return gulp.src(paths.build.svg.dir, { read: false })
+        .pipe( clean() )
+    ;
 });
 
-gulp.task('clean:js', function(cb){
-    del([paths.build.js.dir], cb);
+gulp.task('clean:js', function(){
+    return gulp.src(paths.build.js.dir, { read: false })
+        .pipe( clean() )
+    ;
 });
 
 gulp.task('webserver', function(){
@@ -114,11 +124,13 @@ gulp.task('reload:manifest', function(cb){
 });
 
 gulp.task('js', function(){
-    return gulp.src([
-        paths.src.dir + '/vendor/svg4everybody/svg4everybody.js',
+    var src = [
         paths.src.dir + '/vendor/zepto/zepto.js',
+        paths.src.dir + '/vendor/svg4everybody/svg4everybody.js',
         paths.src.js.dir + '/**/*.js'
-    ], { base: paths.src.dir })
+    ];
+
+    return gulp.src(src, { base: paths.src.dir })
         .pipe( sourcemaps.init() )
         .pipe( concat('js/app.min.js') )
         .pipe( size() )
