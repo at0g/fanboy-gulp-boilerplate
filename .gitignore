@@ -4,7 +4,7 @@
 node_modules
 
 # build directory
-dist
+build
 
 # bower packages
 src/vendor

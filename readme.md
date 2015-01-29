@@ -28,5 +28,5 @@ Run the default task `gulp`
 
 Navigate your favourite browser to `http://localhost:3000`
 
-Edit the files in `src` directory - as long as `gulp` is running the generated files will written to the `dist` 
+Edit the files in `src` directory - as long as `gulp` is running the generated files will written to the `build` 
 directory and changes will be updated in your browser.

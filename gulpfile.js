@@ -46,19 +46,19 @@ var paths = {
         }
     },
     build: {
-        dir: path.join(process.cwd(), 'dist'),
+        dir: path.join(process.cwd(), 'build'),
         manifest: 'bundle.json',
         css: {
-            dir: './dist/css'
+            dir: './build/css'
         },
         images: {
-            dir: './dist/assets/images'
+            dir: './build/assets/images'
         },
         js: {
-            dir: './dist/js'
+            dir: './build/js'
         },
         svg: {
-            dir: './dist/assets/svg'
+            dir: './build/assets/svg'
         }
     }
 };
