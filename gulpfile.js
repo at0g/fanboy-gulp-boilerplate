@@ -118,9 +118,13 @@ gulp.task('webserver', function(){
 });
 
 gulp.task('reload:manifest', function(cb){
-    var json = fs.readFileSync(paths.build.dir + '/' + paths.build.manifest, 'utf8');
-    manifest = JSON.parse(json);
-    cb();
+    fs.readFile(paths.build.dir + '/' + paths.build.manifest, 'utf8', function(err, json){
+        if(err){
+            return cb();
+        }
+        manifest = JSON.parse(json);
+        cb();
+    });
 });
 
 gulp.task('js', function(){
